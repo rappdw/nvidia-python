@@ -102,7 +102,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
 ##########################
 ENV DRIVER_VERSION 375.51
 
-ADD config.gz
+ADD config.gz .
 RUN  mkdir -p /usr/src/kernels \
     && cd /usr/src/kernels \
     && git clone -q git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git --single-branch --depth 1 --branch v`uname -r | sed -e "s/-.*//" | sed -e "s/\.[0]*$//"`  linux \
