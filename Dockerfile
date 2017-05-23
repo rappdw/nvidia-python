@@ -86,7 +86,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
         fi \
     ) \
 	; \
-    && apt-get autoremove \
+    apt-get autoremove \
     && apt-get clean \
     && rm -rf /var/tmp /var/lib/apt/lists/* \
     && rm -rf /tmp/*
