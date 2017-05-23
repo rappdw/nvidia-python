@@ -3,6 +3,7 @@ FROM ubuntu:16.04
 ##########################
 ## All apt-get installs (tools, nvida requirements, cuda, etc.)
 ##########################
+ENV CUDA_VERSION 8.0.61
 ENV CUDA_PKG_VERSION 8-0=$CUDA_VERSION-1
 ENV CUDNN_VERSION 5.1.10
 RUN echo "deb http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1604/x86_64 /" > /etc/apt/sources.list.d/nvidia-ml.list
@@ -117,7 +118,6 @@ CMD ${NVIDIA_INSTALLER} -q -a -n -s --kernel-source-path=/usr/src/kernels/linux/
 ##########################
 ## NVIDIA CUDA install
 ##########################
-ENV CUDA_VERSION 8.0.61
 LABEL com.nvidia.cuda.version="${CUDA_VERSION}"
 
 RUN /opt/nvidia/driver.run --silent --no-kernel-module --no-unified-memory --no-opengl-files
