@@ -102,12 +102,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
 ##########################
 ENV DRIVER_VERSION 375.51
 
+ADD config.gz
 RUN  mkdir -p /usr/src/kernels \
     && cd /usr/src/kernels \
     && git clone -q git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git --single-branch --depth 1 --branch v`uname -r | sed -e "s/-.*//" | sed -e "s/\.[0]*$//"`  linux \
     && cd linux \
     && git checkout -qb stable v`uname -r | sed -e "s/-.*//" | sed -e "s/\.[0]*$//"` \
-    && zcat /proc/config.gz > .config \
+    && zcat config.gz > .config \
     && make modules_prepare \
     && sed -i -e "s/`uname -r | sed -e "s/-.*//" | sed -e "s/\.[0]??*$//"`/`uname -r`/" include/generated/utsrelease.h # In case a '+' was added
 
@@ -183,7 +184,10 @@ RUN set -ex \
 			-o \
 			\( -type f -a -name '*.pyc' -o -name '*.pyo' \) \
 		\) -exec rm -rf '{}' + \
-	&& rm -rf /usr/src/python
+	&& rm -rf /usr/src/python \
+    && apt-get clean \
+    && rm -rf /var/tmp /var/lib/apt/lists/* \
+    && rm -rf /tmp/*
 
 ## Create symlinks
 RUN cd /usr/local/bin \
