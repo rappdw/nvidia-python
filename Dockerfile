@@ -102,16 +102,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
 ##########################
 ENV DRIVER_VERSION 375.51
 
-ADD config.gz /config.gz
 RUN  mkdir -p /usr/src/kernels \
     && cd /usr/src/kernels \
     && git clone -q git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git --single-branch --depth 1 --branch v`uname -r | sed -e "s/-.*//" | sed -e "s/\.[0]*$//"`  linux \
     && cd linux \
     && git checkout -qb stable v`uname -r | sed -e "s/-.*//" | sed -e "s/\.[0]*$//"` \
-    && zcat /config.gz > .config \
+    && zcat /proc/config.gz > .config \
     && make modules_prepare \
-    && sed -i -e "s/`uname -r | sed -e "s/-.*//" | sed -e "s/\.[0]??*$//"`/`uname -r`/" include/generated/utsrelease.h # In case a '+' was added \
-    && rm /config.gz
+    && sed -i -e "s/`uname -r | sed -e "s/-.*//" | sed -e "s/\.[0]??*$//"`/`uname -r`/" include/generated/utsrelease.h # In case a '+' was added
 
 RUN mkdir -p /opt/nvidia && cd /opt/nvidia/ \
     && wget -q http://us.download.nvidia.com/XFree86/Linux-x86_64/${DRIVER_VERSION}/NVIDIA-Linux-x86_64-${DRIVER_VERSION}.run -O /opt/nvidia/driver.run \
