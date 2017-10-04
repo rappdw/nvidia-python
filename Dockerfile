@@ -1,5 +1,7 @@
 FROM ubuntu:16.04
 
+# Taken from https://github.com/docker-library/python/
+
 ##########################
 ## All apt-get installs (tools, nvida requirements, cuda, etc.)
 ##########################
@@ -144,7 +146,7 @@ ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64
 ##########################
 
 ENV GPG_KEY 0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D
-ENV PYTHON_VERSION 3.6.1
+ENV PYTHON_VERSION 3.6.2
 
 RUN set -ex \
 	&& buildDeps=' \
@@ -154,12 +156,12 @@ RUN set -ex \
 	' \
 	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
 	\
-	&& wget -qO python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz" \
-	&& wget -qO python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc" \
+	&& wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz" \
+	&& wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc" \
 	&& export GNUPGHOME="$(mktemp -d)" \
 	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPG_KEY" \
 	&& gpg --batch --verify python.tar.xz.asc python.tar.xz \
-	&& rm -r "$GNUPGHOME" python.tar.xz.asc \
+	&& rm -rf "$GNUPGHOME" python.tar.xz.asc \
 	&& mkdir -p /usr/src/python \
 	&& tar -xJC /usr/src/python --strip-components=1 -f python.tar.xz \
 	&& rm python.tar.xz \
@@ -170,6 +172,8 @@ RUN set -ex \
 		--build="$gnuArch" \
 		--enable-loadable-sqlite-extensions \
 		--enable-shared \
+		--with-system-expat \
+		--with-system-ffi \
 		--without-ensurepip \
 	&& make -j "$(nproc)" \
 	&& make install \
@@ -179,43 +183,43 @@ RUN set -ex \
 	\
 	&& find /usr/local -depth \
 		\( \
-			\( -type d -a -name test -o -name tests \) \
+			\( -type d -a \( -name test -o -name tests \) \) \
 			-o \
-			\( -type f -a -name '*.pyc' -o -name '*.pyo' \) \
+			\( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
 		\) -exec rm -rf '{}' + \
 	&& rm -rf /usr/src/python \
     && apt-get clean \
     && rm -rf /var/tmp /var/lib/apt/lists/* \
     && rm -rf /tmp/*
 
-## Create symlinks
+# make some useful symlinks that are expected to exist
 RUN cd /usr/local/bin \
 	&& ln -s idle3 idle \
 	&& ln -s pydoc3 pydoc \
 	&& ln -s python3 python \
 	&& ln -s python3-config python-config
 
-##########################
-## Install Pip
-##########################
+# if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
 ENV PYTHON_PIP_VERSION 9.0.1
 
 RUN set -ex; \
-	wget -qO get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
+	\
+	wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
+	\
 	python get-pip.py \
 		--disable-pip-version-check \
 		--no-cache-dir \
 		"pip==$PYTHON_PIP_VERSION" \
 	; \
 	pip --version; \
+	\
 	find /usr/local -depth \
 		\( \
-			\( -type d -a -name test -o -name tests \) \
+			\( -type d -a \( -name test -o -name tests \) \) \
 			-o \
-			\( -type f -a -name '*.pyc' -o -name '*.pyo' \) \
+			\( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
 		\) -exec rm -rf '{}' +; \
 	rm -f get-pip.py
-
 
 ##########################
 ## Misc
