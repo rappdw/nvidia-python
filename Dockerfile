@@ -20,4 +20,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		tcl \
 		tk \
 		libffi-dev \
-	&& rm -rf /var/lib/apt/lists/*
+		libgomp1 \
+	&& apt-get clean \
+    && rm -rf /var/tmp /tmp /var/lib/apt/lists/* \
+    && mkdir -p /var/tmp /tmp \
+
