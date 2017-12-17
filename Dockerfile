@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		tk \
 		libffi-dev \
 		libgomp1 \
+		libssl-dev \
 	&& apt-get clean \
     && rm -rf /var/tmp /tmp /var/lib/apt/lists/* \
-    && mkdir -p /var/tmp /tmp \
-
+    && mkdir -p /var/tmp /tmp
