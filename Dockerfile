@@ -5,6 +5,9 @@ ENV PYTHON_PIP_VERSION 9.0.1
 
 COPY --from=python /usr/local/bin /usr/local/bin
 COPY --from=python /usr/local/lib /usr/local/lib
+COPY --from=python /usr/local/include /usr/local/include
+COPY --from=python /usr/local/man /usr/local/man
+COPY --from=python /usr/local/share /usr/local/share
 
 # make some useful symlinks that are expected to exist
 RUN ldconfig \
