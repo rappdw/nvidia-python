@@ -1,5 +1,5 @@
-FROM python:3.6.3 as python
-FROM nvidia/cuda:8.0-cudnn6-runtime-ubuntu16.04
+FROM python:3.6.4 as python
+FROM nvidia/cuda:9.0-cudnn7-runtime-ubuntu16.04
 ENV PYTHON_VERSION 3.6.3
 ENV PYTHON_PIP_VERSION 9.0.1
 
