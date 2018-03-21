@@ -1,4 +1,17 @@
 FROM python:3.6.4 as python
+
+ADD setup-venv.py /tmp/setup-venv.py
+ADD requirements.txt /tmp/requirements.txt
+RUN pip install -U pip
+RUN pip install -r /tmp/requirements.txt
+RUN /tmp/setup-venv.py
+RUN . /cpu-env \
+    && pip install -U pip \
+    && pip install tensorflow
+RUN . /gpu-env \
+    && pip install -U pip \
+    && pip install tensorflow-gpu
+
 FROM nvidia/cuda:9.0-cudnn7-runtime-ubuntu16.04
 ENV PYTHON_VERSION 3.6.4
 ENV PYTHON_PIP_VERSION 9.0.1
@@ -8,6 +21,11 @@ COPY --from=python /usr/local/lib /usr/local/lib
 COPY --from=python /usr/local/include /usr/local/include
 COPY --from=python /usr/local/man /usr/local/man
 COPY --from=python /usr/local/share /usr/local/share
+COPY --from=python /.cpu-env /.cpu-env
+COPY --from=python /.gpu-env /.gpu-env
+
+RUN ln -s /.cpu-env/bin/activate /cpu-env \
+    && ln -s /.gpu-env/bin/activate /gpu-env
 
 # make some useful symlinks that are expected to exist
 RUN ldconfig \
