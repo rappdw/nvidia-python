@@ -1,6 +1,7 @@
 FROM python:3.6.4 as python
 
-ADD setup-venv.py /tmp/setup-venv.py
+ADD setup-venv.py /tmp/setup-venv
+ADD replicate-to-venv /usr/local/bin/replicate-to-venv
 ADD requirements.txt /tmp/requirements.txt
 ###
 # In creating an image that supports either CPU or GPU versions of TensorFlow we do
@@ -30,15 +31,13 @@ ADD requirements.txt /tmp/requirements.txt
 ###
 RUN pip install -U pip
 RUN pip install -r /tmp/requirements.txt
-RUN /tmp/setup-venv.py
+RUN /tmp/setup-venv
 RUN . /cpu-env \
     && pip install -U pip \
-    && pip install tensorflow \
-    && pip install pylint pytest pytest-cov
+    && pip install tensorflow
 RUN . /gpu-env \
     && pip install -U pip \
-    && pip install tensorflow-gpu \
-    && pip install pylint pytest pytest-cov
+    && pip install tensorflow-gpu
 
 FROM nvidia/cuda:9.0-cudnn7-runtime-ubuntu16.04
 ENV PYTHON_VERSION 3.6.4

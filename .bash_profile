@@ -9,5 +9,6 @@ WORKDIR=${WORKDIR:-"/workdir"}
 if [ -e $WORKDIR ]
 then
     pip install -e $WORKDIR
+    replicate-to-venv
 fi
 
