@@ -1,8 +1,5 @@
 FROM python:3.6.4 as python
 
-ADD setup-venv.py /tmp/setup-venv
-ADD replicate-to-venv /usr/local/bin/replicate-to-venv
-ADD requirements.txt /tmp/requirements.txt
 ###
 # In creating an image that supports either CPU or GPU versions of TensorFlow we do
 # the following:
@@ -21,26 +18,33 @@ ADD requirements.txt /tmp/requirements.txt
 #      There are a few work-arounds for this issue:
 #        a) Install any python modules with scripts into both virtual environments rather than
 #           into system site packages (works well for modules that aren't large and install quickly)
-#        b) Install any python modules with scripts into system site packages, but copy and rewrite
-#           script she-bangs for each virtual environment (works well for large modules or modules that
-#           have lengthy installs)
-#        c) symlink everything in the system site /bin directory (we think)
+#        b) Install any python modules with scripts into system site packages, but run 'fix-shebang'
+#           to reset the python specification to use `/usr/bin/env` rather than hard-coding to the
+#           python in system (works well for large modules or modules that have lengthy installs)
+#
+#           This is the option selected for this docker image. fix-shebang is placed into /etc/profile.d,
+#           .bashrc, and .bash_profile are setup to ensure that the correct CPU/GPU env, and fix-shebang
+#           are invoked for any common bash shell instantiations (login, interactive non-login, and
+#           non-interactive shells).
+#
 # 3) In each of the virtual environments, install the appropriate TensorFlow (as well as any modules
 #    with scripts and work-around b).
 #
 ###
+ADD setup-venv /tmp/setup-venv
+ADD requirements.txt /tmp/requirements.txt
 RUN pip install -U pip
 RUN pip install -r /tmp/requirements.txt
 RUN /tmp/setup-venv
 RUN . /cpu-env \
     && pip install -U pip \
-    && pip install tensorflow
+    && pip install tensorflow==1.4.0
 RUN . /gpu-env \
     && pip install -U pip \
-    && pip install tensorflow-gpu
+    && pip install tensorflow-gpu==1.4.0
 
-FROM nvidia/cuda:9.0-cudnn7-runtime-ubuntu16.04
-ENV PYTHON_VERSION 3.6.4
+FROM nvidia/cuda:8.0-cudnn6-runtime-ubuntu16.04
+ENV PYTHON_VERSION 3.6.3
 ENV PYTHON_PIP_VERSION 9.0.3
 
 COPY --from=python /usr/local/bin /usr/local/bin
@@ -76,6 +80,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # add .bashrc that detects environment (CPU vs. GPU) and sources the correct
 # venv to support the requested env
+ADD fix-shebang /usr/local/bin/fix-shebang
 ADD .bashrc /root/.bashrc
 ADD .bash_profile /root/.bash_profile
+ADD cpu-gpu-env.sh /etc/profile.d/cpu-gpu-env.sh
+ENV BASH_ENV=/etc/profile.d/cpu-gpu-env.sh
 ENTRYPOINT ["/bin/bash"]
