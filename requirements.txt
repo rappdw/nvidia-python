@@ -6,7 +6,7 @@ gast
 grpcio
 html5lib==0.9999999
 markdown
-numpy
+numpy==1.14.0
 protobuf
 termcolor
 werkzeug

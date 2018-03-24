@@ -1,5 +1,3 @@
-FROM python:3.6.4 as python
-
 ###
 # In creating an image that supports either CPU or GPU versions of TensorFlow we do
 # the following:
@@ -31,6 +29,8 @@ FROM python:3.6.4 as python
 #    with scripts and work-around b).
 #
 ###
+FROM python:3.6.4 as python
+
 COPY setup-venv /tmp/
 COPY requirements.txt /tmp/
 COPY fix-shebang /usr/local/bin/
@@ -74,11 +74,6 @@ RUN ln -s /.cpu-env/bin/activate /cpu-env \
     && rm -rf /var/tmp /tmp /var/lib/apt/lists/* \
     && mkdir -p /var/tmp /tmp
 
-# add .bashrc that detects environment (CPU vs. GPU) and sources the correct
-# venv to support the requested env
-#COPY root_dir/* /root/
-#COPY cpu-gpu-env.sh /etc/profile.d/cpu-gpu-env.sh
-#ENV BASH_ENV=/etc/profile.d/cpu-gpu-env.sh
 COPY ./docker-entrypoint.sh /
 CMD []
 ENTRYPOINT ["/docker-entrypoint.sh"]
