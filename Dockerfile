@@ -31,8 +31,10 @@ FROM python:3.6.4 as python
 #    with scripts and work-around b).
 #
 ###
-ADD setup-venv /tmp/setup-venv
-ADD requirements.txt /tmp/requirements.txt
+COPY setup-venv /tmp/
+COPY requirements.txt /tmp/
+COPY fix-shebang /usr/local/bin/
+
 RUN pip install -U pip
 RUN pip install -r /tmp/requirements.txt
 RUN /tmp/setup-venv
@@ -44,31 +46,25 @@ RUN . /gpu-env \
     && pip install tensorflow-gpu
 
 FROM nvidia/cuda:9.0-cudnn7-runtime-ubuntu16.04
-ENV PYTHON_VERSION 3.6.4
-ENV PYTHON_PIP_VERSION 9.0.3
+LABEL maintainer="rappdw@gmail.com"
+ENV PYTHON_VERSION=3.6.4 \
+    PYTHON_PIP_VERSION=9.0.3
 
-COPY --from=python /usr/local/bin /usr/local/bin
-COPY --from=python /usr/local/lib /usr/local/lib
-COPY --from=python /usr/local/include /usr/local/include
-COPY --from=python /usr/local/man /usr/local/man
-COPY --from=python /usr/local/share /usr/local/share
+COPY --from=python /usr/local /usr/local
 COPY --from=python /.cpu-env /.cpu-env
 COPY --from=python /.gpu-env /.gpu-env
 
+# setup useful links and install some dependencies for python
 RUN ln -s /.cpu-env/bin/activate /cpu-env \
-    && ln -s /.gpu-env/bin/activate /gpu-env
-
-# make some useful symlinks that are expected to exist
-RUN ldconfig \
+    && ln -s /.gpu-env/bin/activate /gpu-env \
+    && ldconfig \
     && cd /usr/local/bin \
     && rm idle pydoc python python-config \
 	&& ln -Fs idle3 idle \
 	&& ln -Fs pydoc3 pydoc \
 	&& ln -Fs python3 python \
-	&& ln -Fs python3-config python-config
-
-# runtime dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+	&& ln -Fs python3-config python-config \
+    && apt-get update && apt-get install -y --no-install-recommends \
 		tcl \
 		tk \
 		libffi-dev \
@@ -80,9 +76,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # add .bashrc that detects environment (CPU vs. GPU) and sources the correct
 # venv to support the requested env
-ADD fix-shebang /usr/local/bin/fix-shebang
-ADD .bashrc /root/.bashrc
-ADD .bash_profile /root/.bash_profile
-ADD cpu-gpu-env.sh /etc/profile.d/cpu-gpu-env.sh
-ENV BASH_ENV=/etc/profile.d/cpu-gpu-env.sh
-ENTRYPOINT ["/bin/bash"]
+#COPY root_dir/* /root/
+#COPY cpu-gpu-env.sh /etc/profile.d/cpu-gpu-env.sh
+#ENV BASH_ENV=/etc/profile.d/cpu-gpu-env.sh
+COPY ./docker-entrypoint.sh /
+CMD []
+ENTRYPOINT ["/docker-entrypoint.sh"]
