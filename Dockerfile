@@ -40,14 +40,14 @@ RUN pip install -r /tmp/requirements.txt
 RUN /tmp/setup-venv
 RUN . /cpu-env \
     && pip install -U pip \
-    && pip install tensorflow
+    && pip install tensorflow==1.4.0
 RUN . /gpu-env \
     && pip install -U pip \
-    && pip install tensorflow-gpu
+    && pip install tensorflow-gpu==1.4.0
 
-FROM nvidia/cuda:9.0-cudnn7-runtime-ubuntu16.04
+FROM nvidia/cuda:8.0-cudnn6-runtime-ubuntu16.04
 LABEL maintainer="rappdw@gmail.com"
-ENV PYTHON_VERSION=3.6.4 \
+ENV PYTHON_VERSION=3.6.3 \
     PYTHON_PIP_VERSION=9.0.3
 
 COPY --from=python /usr/local /usr/local
