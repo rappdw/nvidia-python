@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
+docker build -t resero/nvidia-python -f Dockerfile .
 docker build -t rappdw/nvidia-python -f Dockerfile .
