@@ -29,7 +29,7 @@
 #    with scripts and work-around b).
 #
 ###
-FROM python:3.6.4 as python
+FROM python:3.6.3 as python
 
 COPY setup-venv /tmp/
 COPY requirements.txt /tmp/
