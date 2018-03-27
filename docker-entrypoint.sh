@@ -7,10 +7,12 @@ if [ -e $WORKDIR/setup.py ]; then
     pip install -e $WORKDIR
 fi
 
-# source the correct CPU or GPU virtual environment
-CPU_GPU_ENV=${CPU_GPU_ENV:-"/cpu-env"}
-if [ -e $CPU_GPU_ENV ]; then
-    . $CPU_GPU_ENV
+# source the correct CPU or GPU virtual environment using NVIDIA_VISIBLE_DEVICES
+# Values are documented here: https://github.com/nvidia/nvidia-container-runtime#nvidia_visible_devices
+if [ -z $NVIDIA_VISIBLE_DEVICES ] || [ "$NVIDIA_VISIBLE_DEVICES" = "void" ]; then
+    . /.cpu-env/bin/activate
+else
+    . /.gpu-env/bin/activate
 fi
 
 # fix any python script shebangs in the /usr/local/bin directory
