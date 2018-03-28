@@ -46,6 +46,7 @@ RUN . /gpu-env \
     && pip install tensorflow-gpu==1.4.0
 
 FROM nvidia/cuda:8.0-cudnn6-runtime-ubuntu16.04
+ARG DEBIAN_FRONTEND=noninteractive
 LABEL maintainer="rappdw@gmail.com"
 ENV PYTHON_VERSION=3.6.3 \
     PYTHON_PIP_VERSION=9.0.3
