@@ -4,16 +4,21 @@ import os
 import subprocess
 
 if __name__ == '__main__':
-    textchars = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f})
+    textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7f})
     is_binary_string = lambda bytes: bool(bytes.translate(None, textchars))
-    dir = '/usr/local/bin'
-    files = os.listdir(dir)
-    for file in files:
-        fqn = os.path.join(dir, file)
-        if os.path.isfile(fqn):
-            if not is_binary_string(open(fqn, 'rb').read(1024)):
-                with open(fqn) as f:
-                    first_line = f.readline()
-                    run_conversion = first_line.startswith('#!') and 'python' in first_line
-                if run_conversion:
-                    subprocess.call(["sed", "-i", f"s|{dir}/python|/usr/bin/env python|", os.path.join(dir, file)])
+    dirs = ['/usr/local/bin', '/.cpu-env/bin/', '/.gpu-env/bin/']
+    for dir in dirs:
+        files = os.listdir(dir)
+        for file in files:
+            fqn = os.path.join(dir, file)
+            if os.path.isfile(fqn):
+
+                if not is_binary_string(open(fqn, 'rb').read(1024)):
+                    with open(fqn, encoding='utf8') as f:
+                        first_line = f.readline()
+                        run_conversion = first_line.startswith('#!') and 'python' in first_line
+                    if run_conversion:
+                        subprocess.call(
+                            ["sed", "-i", f"s|/usr/local/bin/python|/usr/bin/env python|", os.path.join(dir, file)])
+                        subprocess.call(
+                            ["sed", "-i", f"s|{dir}python|/usr/bin/env python|", os.path.join(dir, file)])
