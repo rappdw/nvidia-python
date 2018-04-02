@@ -29,7 +29,7 @@
 #    with scripts and work-around b).
 #
 ###
-FROM python:3.6.4 as python
+FROM python:3.6.5 as python
 
 COPY setup-venv /tmp/
 COPY requirements.txt /tmp/
@@ -48,7 +48,7 @@ RUN . /gpu-env \
 FROM nvidia/cuda:9.0-cudnn7-runtime-ubuntu16.04
 ARG DEBIAN_FRONTEND=noninteractive
 LABEL maintainer="rappdw@gmail.com"
-ENV PYTHON_VERSION=3.6.3 \
+ENV PYTHON_VERSION=3.6.5 \
     PYTHON_PIP_VERSION=9.0.3
 
 COPY --from=python /usr/local /usr/local
