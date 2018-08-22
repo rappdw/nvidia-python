@@ -1,4 +1,4 @@
-FROM nvidia/cuda:9.2-cudnn7-runtime-ubuntu18.04
+FROM nvidia/cuda:9.2-devel-ubuntu18.04
 ARG DEBIAN_FRONTEND=noninteractive
 LABEL maintainer="rappdw@gmail.com"
 
