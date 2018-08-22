@@ -4,7 +4,7 @@ source /.venv/bin/activate
 
 WORKDIR=${WORKDIR:-"/workdir"}
 
-# install the module mounted in $WORKDIR
+# if there is a python module in $WORKDIR, install it
 if [ -e $WORKDIR/setup.py ]; then
     pip install -e $WORKDIR
 fi
