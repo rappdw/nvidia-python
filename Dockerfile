@@ -11,6 +11,7 @@ RUN apt-get update; \
     apt-get install -y \
         build-essential \
         openssl \
+        libbz2-dev \
         libffi-dev \
         libssl-dev \
         tk-dev \
@@ -105,6 +106,7 @@ RUN ldconfig \
 # pick up some python and CUDA toolkit dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+        bzip2 \
 		tcl \
 		tk \
 		libffi-dev \
