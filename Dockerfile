@@ -21,7 +21,7 @@ RUN apt-get update; \
     rm -rf /var/tmp/* /tmp/* /var/lib/apt/lists/*
 
 ENV GPG_KEY 0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D
-ENV PYTHON_VERSION 3.7.2
+ENV PYTHON_VERSION 3.6.8
 
 RUN set -ex \
 	\
@@ -89,7 +89,7 @@ FROM nvidia/cuda:10.0-cudnn7-runtime-ubuntu18.04
 ARG DEBIAN_FRONTEND=noninteractive
 LABEL maintainer="rappdw@gmail.com"
 
-ENV PYTHON_VERSION=3.7.2 \
+ENV PYTHON_VERSION=3.6.8 \
     PYTHON_PIP_VERSION=18.1
 
 COPY --from=python /usr/local /usr/local
